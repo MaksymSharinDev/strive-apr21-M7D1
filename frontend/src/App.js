@@ -3,10 +3,16 @@ import './App.css';
 import {Redirect, Route, BrowserRouter, Switch} from "react-router-dom";
 import SearchPage from "./components/pages/SearchPage/SearchPage";
 import CompanyDetails from "./components/CompanyDetails/CompanyDetails";
+import {Container, Row} from "react-bootstrap";
+import {useState} from "react";
 
 
 
 function App() {
+
+    let [ searchBarData , setSearchBarData ] = useState([])
+    let keepSearchState = (arr) => setSearchBarData(arr)
+
   return (
     <div className="App">
       <BrowserRouter>
@@ -16,10 +22,20 @@ function App() {
                       <Redirect to={"/homepage"}/>
                   </Route>
                   <Route exact path="/homepage">
-                      <SearchPage/>
+                      <Container >
+                          <Row >
+                            <SearchPage handOffCallback={keepSearchState}/>
+                          </Row>
+                      </Container>
                   </Route>
-                  <Route exact path="/company-details">
-                      <CompanyDetails/>
+                  <Route  path="/company-details/">
+                      <Container >
+                          <Row >
+                              <SearchPage searchBarData={searchBarData} />
+                              <CompanyDetails/>
+                          </Row>
+                      </Container>
+
                   </Route>
               </Switch>
           </main>
