@@ -8,9 +8,7 @@ const CompanyDetails = () => {
                 <div style={{minHeight: '175px'}}>
 
                 </div>
-                <div style={{background: 'lightblue', height: '200px'}}>
 
-                </div>
             </Row>
         </Col>
         )

@@ -4,28 +4,33 @@ import {Card, Col, Container, Row} from "react-bootstrap";
 import {withRouter} from "react-router";
 import {Link} from "react-router-dom";
 import DOMPurify from 'dompurify';
+import {connect} from "react-redux";
+import {setPageResultsAction} from "./actions";
+
 //TODO refactor to redux the search query handoff
+
+const mapStateToProps  = state => ({
+    pageResults: state.searchPage.pageResults
+})
+const mapDispatchToProps = dispatch => ({
+    setPageResults: (data) => dispatch( setPageResultsAction(data) )
+})
+
 class SearchPage extends React.Component {
     state = {
         jobs: [],
-        searchBarData: [],
+        pageResults: [],
         searchQuery: '',
         isFocusing: false,
-        handOffCallback: null
     }
     searchBarRef = createRef()
 
     componentDidMount = async () => {
 
-        //let res = await fetch(`https://remotive.io/api/remote-jobs?limit=10`)
-        //let obj = await res.json()
-        //let [searchBarData, jobs] = obj.jobs;
-        //let state = {...this.state, jobs, searchBarData}
-        if ( !!this.props.searchBarData ){
-            let searchBarData = this.props.searchBarData
-            let state = {...this.state, searchBarData }
-            this.setState(state)
-        }
+        let pageResults = this.props.pageResults
+        let state = {...this.state, pageResults }
+        this.setState(state)
+
     }
     onSearchFocus = e => {
         let state = {...this.state}
@@ -51,9 +56,9 @@ class SearchPage extends React.Component {
         let queryStr = encodeURIComponent(this.state.searchQuery)
         let res = await fetch(`https://remotive.io/api/remote-jobs?limit=10&search=${queryStr}`)
         let obj = await res.json()
-        let searchBarData = obj.jobs;
-        this.props.handOffCallback && this.props.handOffCallback( searchBarData )
-        let state = {...this.state, searchBarData}
+        let pageResults = obj.jobs;
+        this.props.setPageResults(pageResults)
+        let state = {...this.state, pageResults}
         this.setState(state)
     }
     render = () =>
@@ -77,21 +82,22 @@ class SearchPage extends React.Component {
                                 </button>
                             </div>
                         </Col>
-                        {this.state.searchBarData.length > 0 &&
-                        this.state.searchBarData.slice(0, 10).map(
+                        {this.state.pageResults.length > 0 &&
+                        this.state.pageResults.slice(0, 10).map(
                             job =>
                                 <>
                                     <Col sm={12} md={12} lg={12}>
                                         <Card className={'m-4'}>
                                             <Card.Title>
 
-                                                <Link to={`/company-details/${job.id}`}>
+                                                <Link to={`/jobDetail/${job.id}`}>
                                                     <h3> {job.title} </h3>
                                                 </Link>
 
                                             </Card.Title>
                                             <Card.Body>
-                                                <p> company: {job.company_name} </p>
+                                                <p> company:  </p>
+                                                <Link to={`/company-details/`}> {job.company_name} </Link>
                                                 <p> category: {job.category} </p>
                                                 {/*}
                                                 <div dangerouslySetInnerHTML={
@@ -109,4 +115,4 @@ class SearchPage extends React.Component {
 
 }
 
-export default withRouter(SearchPage)
+export default connect(mapStateToProps, mapDispatchToProps)( withRouter(SearchPage) )
